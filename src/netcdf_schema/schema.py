@@ -19,7 +19,7 @@ class LocatorData():
 
 @dataclass
 class Locator():
-    locator: Locator
+    locator: LocatorData
 
 @dataclass
 class Range():

@@ -1,0 +1,13 @@
+certifi==2024.8.30
+cftime==1.6.4
+cfunits==3.3.7
+marshmallow==3.21.3
+marshmallow_dataclass==8.7.0
+mypy-extensions==1.0.0
+netCDF4==1.7.1.post2
+numpy==2.1.1
+packaging==24.1
+PyYAML==6.0.2
+typeguard==4.0.1
+typing-inspect==0.9.0
+typing_extensions==4.12.2

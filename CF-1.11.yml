@@ -199,8 +199,7 @@ groups:
                   - ancillary_variables  
         count: 0
         comments: 'Attribute not allowed for Coordinate variables'
-        
-        
+           
       # 2.6.3 No variable named by external_variables is allowed in the file.
       - criteria:
           name: external_variables
@@ -216,7 +215,7 @@ groups:
 
       # 2.4 The dimensions of a variable must all have different names.
       - schema:
-          - unique_dimensions: true
+          unique_dimensions: true
         comments: '2.4 The dimensions of a variable must all have different names.'
       ##
 
@@ -240,7 +239,7 @@ groups:
       - criteria:
           attributes: 
             - name: _FillValue
-      - schema:
+        schema:
           attributes: 
             - name: _FillValue
               type:
@@ -255,7 +254,7 @@ groups:
       - criteria:
           attributes: 
             - name: missing_value
-      - schema:
+        schema:
           attributes: 
             - name: missing_value
               type: 
@@ -287,7 +286,7 @@ groups:
             - name: actual_range 
             - name: scale_factor
         schema:
-          - attributes: 
+          attributes: 
             - name: actual_range
               type:
                 locator:
@@ -408,7 +407,7 @@ groups:
           attributes:
             - name: units_metadata
               value: 'temperature: difference'
-        commnet: '3.1 If the standard_name attribute includes the standard_error modifier, the units_metadata attribute, if present, must have the value temperature: difference.'
+        comments: '3.1 If the standard_name attribute includes the standard_error modifier, the units_metadata attribute, if present, must have the value temperature: difference.'
       ##
 
       # 3.1 If the cell_methods attribute includes any entry with any of the methods range, standard_deviation or variance, 
@@ -451,7 +450,7 @@ groups:
           attributes:
             - name: standard_name
         schema:
-          attribute:
+          attributes:
             - name: standard_name
               value:
                 choice: [] # TODO: Put all the allowed values here or think about a better way
@@ -464,7 +463,7 @@ groups:
               value:  
                 re: "area_type.*"
         schema:
-          attribute:
+          attributes:
             - name: standard_name
               value: 
                 re: '' # TODO: Put all the allowed values here or think about a better way
