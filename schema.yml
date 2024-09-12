@@ -1,0 +1,962 @@
+netcdf_schema_version: '1.0'
+# CF-11
+constants:
+  cf_attributes:
+    - actual_range
+    - add_offset
+    - ancillary_variables
+    - axis
+    - bounds
+    - calendar
+    - cell_measures
+    - cell_methods
+    - cf_role
+    - climatology
+    - comment
+    - compress
+    - computed_standard_name
+    - Conventions
+    - coordinate_interpolation
+    - coordinates
+    - dimensions
+    - external_variables
+    - _FillValue
+    - featureType
+    - flag_masks
+    - flag_meanings
+    - flag_values
+    - formula_terms
+    - geometry
+    - geometry_type
+    - grid_mapping
+    - history
+    - instance_dimension
+    - institution
+    - interior_ring
+    - leap_month
+    - leap_year
+    - location
+    - location_index_set
+    - long_name
+    - mesh
+    - missing_value
+    - month_lengths
+    - node_coordinates
+    - node_count
+    - nodes
+    - part_node_count
+    - positive
+    - references
+    - sample_dimension
+    - scale_factor
+    - source
+    - standard_error_multiplier
+    - standard_name
+    - title
+    - units
+    - units_metadata
+    - valid_max
+    - valid_min
+    - valid_range
+
+groups:
+
+  # Root group
+  - name: /
+    attributes:
+
+      # 2.6.1 Files that conform to the CF version 1.11 conventions must indicate this by setting the global Conventions attribute to contain the CF string value "CF-1.11"
+      - criteria:
+          name: Conventions
+          value: "CF-1.11"
+        count: 1
+        comments: '2.6.1 Files that conform to the CF version 1.11 conventions must indicate this by setting the global Conventions attribute to contain the CF string value "CF-1.11"'
+
+  # Any group except root
+  - name: "[^/]+"
+    attributes:
+      # 2.7 The Conventions and external_variables attributes must not be used in non-root groups.
+      - criteria:
+          name: Conventions
+        count: 0
+        comments: '2.7 The Conventions and external_variables attributes must not be used in non-root groups.'
+
+      - criteria:
+          name: external_variables 
+        count: 0
+        comments: '2.7 The Conventions and external_variables attributes must not be used in non-root groups.'
+
+      ##
+
+  # Any group
+  - name: '.+'
+    attributes:
+  
+      # 2.3 Variable, dimension and attribute names should begin with a letter and be composed of letters (A-Z, a-z), digits (0-9), and underscores(_).
+      - schema:
+          name: 
+            re: ^[A-Za-z][A-Za-z0-9_]*$ 
+        comments: '2.3 Variable, dimension and attribute names should begin with a letter and be composed of letters (A-Z, a-z), digits (0-9), and underscores(_).'
+      ##
+
+      # 2.6.2 The title, history, institution, source, references, and comment attributes are all type string
+      - criteria:
+          name: title
+        schema:
+          type: string
+        comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
+      - criteria:
+          name: history
+        schema:
+          type: string
+        comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
+      - criteria:
+          name: institution
+        schema:
+          type: string
+        comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
+      - criteria:
+          name: source
+        schema:
+          type: string
+        comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
+      - criteria:
+          name: references
+        schema:
+          type: string
+        comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
+      - criteria:
+          name: comment
+        schema:
+          type: string
+        comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
+        ##
+
+      # 2.6.3 The external_variables attribute is of string type and contains a blank-separated list of variable names.
+      - criteria:
+          name: external_variables
+        schema:
+          value: 
+            re: \S+(?:\s+\S+)*
+        comments: '2.6.3 The external_variables attribute is of string type and contains a blank-separated list of variable names'
+
+      # 3.1 The type of the units attribute is a string that must be recognizable by the UDUNITS package. 
+      # Exceptions are the units level, layer, and sigma_level.
+      - criteria:
+          name: units
+        schema:
+          connector: OR
+          statements:
+            - value:
+                udunits: 
+                  is_valid: true
+            - value: 
+                choice: [level, layer, sigma_level]
+        comments: '3.1 The type of the units attribute is a string that must be recognizable by the UDUNITS package. Exceptions are the units level, layer, and sigma_level.'
+
+      # 3.1 If present, the units_metadata attribute must have one of these values: temperature: on_scale, temperature: difference, temperature: unknown.
+      - criteria:
+          name: units_metadata
+        schema:
+          value:
+            choice: ['temperature: on_scale', 'temperature: difference', 'temperature: unknown']
+        comments: '3.1 If present, the units_metadata attribute must have one of these values: temperature: on_scale, temperature: difference, temperature: unknown.'
+          
+    dimensions:
+      # 2.3 Variable, dimension and attribute names should begin with a letter and be composed of letters (A-Z, a-z), digits (0-9), and underscores(_).
+      - schema:
+          name:  
+            re: ^[A-Za-z][A-Za-z0-9_]*$ 
+        comments: '2.3 Variable, dimension and attribute names should begin with a letter and be composed of letters (A-Z, a-z), digits (0-9), and underscores(_).'
+      ##
+
+    variables:
+
+      ## actual_range
+      - criteria:
+          attributes:
+            - name: actual_range
+        schema:
+          attributes:
+            - name: actual_range
+              type:
+                choice: ['byte', 'short', 'int', 'float', 'double']
+          
+      - criteria:
+          dimensions_count: 1
+          dimensions:
+            - name:
+                contains:
+                  locator:  
+                    path: ./
+                    type: variable
+                    attr: name
+          type:
+            choice: ['byte', 'short', 'int', 'float', 'double']
+          attributes:
+            - name: 
+                choice: 
+                  - ancillary_variables  
+        count: 0
+        comments: 'Attribute not allowed for Coordinate variables'
+        
+        
+      # 2.6.3 No variable named by external_variables is allowed in the file.
+      - criteria:
+          name: external_variables
+        count: 0
+        comments: '2.6.3 No variable named by external_variables is allowed in the file.'
+
+      # 2.3 Variable, dimension and attribute names should begin with a letter and be composed of letters (A-Z, a-z), digits (0-9), and underscores(_).
+      - schema:
+          name:  
+            re: ^[A-Za-z][A-Za-z0-9_]*$ 
+        comments: '2.3 Variable, dimension and attribute names should begin with a letter and be composed of letters (A-Z, a-z), digits (0-9), and underscores(_).2.3 Variable, dimension and attribute names should begin with a letter and be composed of letters (A-Z, a-z), digits (0-9), and underscores(_).'
+      ##
+
+      # 2.4 The dimensions of a variable must all have different names.
+      - schema:
+          - unique_dimensions: true
+        comments: '2.4 The dimensions of a variable must all have different names.'
+      ##
+
+      # 2.5.1 The valid_range attribute must not be present if the valid_min and/or valid_max attributes are present
+      - criteria:
+          connector: AND
+          statements: 
+            - attributes:
+              - name: valid_range
+            - connector: OR
+              statements:
+                - attributes:
+                  - name: valid_max 
+                - attributes:
+                  - name: valid_min
+        count: 0
+        comments: '2.5.1 The valid_range attribute must not be present if the valid_min and/or valid_max attributes are present'
+      ##
+      
+      # 2.5.1 The _FillValue attribute must be the same type as its associated variable
+      - criteria:
+          attributes: 
+            - name: _FillValue
+      - schema:
+          attributes: 
+            - name: _FillValue
+              type:
+                locator:
+                  path: ./
+                  type: variable
+                  attr: type
+        comments: '2.5.1 The _FillValue attribute must be the same type as its associated variable'
+      ##
+
+      # 2.5.1 The missing_value attribute must be the same type as its associated variable.
+      - criteria:
+          attributes: 
+            - name: missing_value
+      - schema:
+          attributes: 
+            - name: missing_value
+              type: 
+                locator:
+                  path: ./
+                  type: variable
+                  attr: type
+        comments: '2.5.1 The missing_value attribute must be the same type as its associated variable'
+      ##
+
+      # 2.5.1 The actual_range attribute must be of the same type as its associated variable unless there is a scale_factor and/or add_offset attribute, 
+      # in which case it must be of the same type as those attributes.
+      - criteria:
+          attributes: 
+            - name: actual_range 
+            - name: scale_factor
+        schema:
+          attributes: 
+            - name: actual_range
+              type:
+                locator: 
+                  path: ./scale_factor
+                  type: attribute
+                  attr: type
+        comments: '2.5.1 The actual_range attribute must be of the same type as its associated variable unless there is a scale_factor and/or add_offset attribute, in which case it must be of the same type as those attributes.'
+
+      - criteria:
+          attributes: 
+            - name: actual_range 
+            - name: scale_factor
+        schema:
+          - attributes: 
+            - name: actual_range
+              type:
+                locator:
+                  path: ./add_offset
+                  type: attribute
+                  attr: type
+        comments: '2.5.1 The actual_range attribute must be of the same type as its associated variable unless there is a scale_factor and/or add_offset attribute, in which case it must be of the same type as those attributes.'
+
+      - criteria:
+          connector: AND
+          statements:
+            - attributes: 
+                - name: actual_range
+            - attributes:
+                - name: 
+                    neq: add_offset
+            - attributes:
+                - name: 
+                    neq: scale_factor
+        schema:
+          attributes: 
+            - name: actual_range
+              type:
+                locator:
+                  path: ./
+                  type: variable
+                  attr: type
+        comments: '2.5.1 The actual_range attribute must be of the same type as its associated variable unless there is a scale_factor and/or add_offset attribute, in which case it must be of the same type as those attributes.'
+      ##
+
+      # 2.5.1 The actual_range attribute must have two elements, of which the first exactly equals the minimum non-missing value occurring in
+      # the associated variable after any scale_factor and add_offset are applied, and the second exactly equals the maximum value in the same way.
+      - criteria:
+          attributes:
+            - name: actual_range
+        schema:
+          attributes:
+            - name: actual_range
+              length: 2
+        comments: '2.5.1 The actual_range attribute must have two elements, of which the first exactly equals the minimum non-missing value occurring in the associated variable after any scale_factor and add_offset are applied, and the second exactly equals the maximum value in the same way.'
+      ##
+
+      # 2.5.1 If both the actual_range and valid_range/valid_min/valid_max are specified, the values of the actual_range must be valid values
+      - criteria:
+          attributes: 
+            - name: actual_range
+            - name: valid_range
+        schema:
+          attributes: 
+            - name: actual_range
+              value: 
+                range:
+                    min:
+                      locator:
+                        path: ./valid_range
+                        type: attribute
+                        attr: value
+                        index: [0]
+                    max:
+                      locator:
+                        path: ./valid_range
+                        type: attribute
+                        attr: value
+                        index: [1]
+        comments: '2.5.1 If both the actual_range and valid_range/valid_min/valid_max are specified, the values of the actual_range must be valid values'  
+
+      - criteria:
+          attributes: 
+            - name: actual_range
+            - name: valid_min
+            - name: valid_max
+        schema:
+          attributes: 
+            - name: actual_range
+              value: 
+                range:
+                  min:
+                    locator:
+                      path: ./valid_min
+                      type: attribute
+                      attr: value
+                  max:
+                    locator:
+                      path: ./valid_max
+                      type: attribute
+                      attr: value
+
+        comments: '2.5.1 If both the actual_range and valid_range/valid_min/valid_max are specified, the values of the actual_range must be valid values'  
+      ## 
+
+      # 3.1 Dimensionless units for volume fractions defined by UDUNITS (ppv, ppmv, ppbv, pptv, ppqv) are not allowed 
+      # in the units attribute of any variable which also has a standard_name attribute.
+      - criteria:
+          attributes:
+            - name: units
+              value:
+                choice: [ppv, ppmv, ppbv, pptv, ppqv]
+            - name: standard_name
+        count: 0
+        comments: 'Dimensionless units for volume fractions defined by UDUNITS (ppv, ppmv, ppbv, pptv, ppqv) are not allowed in the units attribute of any variable which also has a standard_name attribute.'
+      ## 
+
+      # 3.1 The units of a variable that specifies a standard_name must be physically equivalent to the canonical units given in the standard name table, 
+      # as modified by the standard_name modifier, if there is one, according to Appendix C, and then modified by all the methods listed in order 
+      # by the cell_methods attribute, if one is present, according to Appendix E.
+
+      # TODO
+
+      ##
+
+      # 3.1 If the standard_name attribute includes the standard_error modifier, the units_metadata attribute, if present, 
+      # must have the value temperature: difference.
+      - criteria:
+          attributes:
+            - name: units_metadata
+            - name: standard_name
+        schema:
+          attributes:
+            - name: units_metadata
+              value: 'temperature: difference'
+        commnet: '3.1 If the standard_name attribute includes the standard_error modifier, the units_metadata attribute, if present, must have the value temperature: difference.'
+      ##
+
+      # 3.1 If the cell_methods attribute includes any entry with any of the methods range, standard_deviation or variance, 
+      # the units_metadata attribute, if present, must have the value temperature: difference.
+      - criteria:
+          attributes:
+            - name: units_metadata
+            - name: cell_methods
+              value:  
+                re: '.*name: [standard_deviation|variance].*'
+        schema:
+          attributes:
+            - name: units_metadata
+              value: 'temperature: difference'
+        comments: 'If the cell_methods attribute includes any entry with any of the methods range, standard_deviation or variance, the units_metadata attribute, if present, must have the value temperature: difference.'
+
+      # 3.1 A variable must not have a units_metadata attribute if it has no units attribute or if its units do not involve a temperature unit.
+      - criteria:
+          attributes:
+            - name: units_metadata
+            - name: 
+                neq: units
+        count: 0
+        comments: '3.1 A variable must not have a units_metadata attribute if it has no units attribute or if its units do not involve a temperature unit.'
+
+      - criteria:
+          attributes:
+            - name: units
+              value: 
+                neq: "" # TODO: Check the best way to filter udunits temp
+            - name: temperature_metadata 
+        count: 0
+        comments: '3.1 A variable must not have a units_metadata attribute if it has no units attribute or if its units do not involve a temperature unit.'
+
+      # 3.3 The standard_name attribute takes a string value comprised of a standard name optionally followed by one or more blanks and a standard name modifier.
+      # The legal values for the standard name are contained in the standard name table.
+      # The legal values for the standard name modifier are contained in Appendix C, Standard Name Modifiers.
+      
+      - criteria:
+          attributes:
+            - name: standard_name
+        schema:
+          attribute:
+            - name: standard_name
+              value:
+                choice: [] # TODO: Put all the allowed values here or think about a better way
+        comments: 'The standard_name attribute takes a string value comprised of a standard name optionally followed by one or more blanks and a standard name modifier.'
+
+      # 3.3 If a variable has a standard_name of region or area_type, it must have value(s) from the permitted list.
+      - criteria:
+          attributes:
+            - name: standard_name
+              value:  
+                re: "area_type.*"
+        schema:
+          attribute:
+            - name: standard_name
+              value: 
+                re: '' # TODO: Put all the allowed values here or think about a better way
+        comments: 'If a variable has a standard_name of region or area_type, it must have value(s) from the permitted list.'
+
+      ##
+
+      # 3.5 The flag_values attribute must have the same type as the variable to which it is attached.
+      # The type of the flag_meanings attribute is a string whose value is a blank separated list of words or phrases, 
+      # each consisting of characters from the alphanumeric set and the following five: '_', '-', '.', '+', '@'
+      - criteria:
+          attributes: 
+            - name: flag_values 
+        schema:
+          attributes: 
+            - name: flag_meanings
+              type: string
+              value:  
+                re: ^([a-zA-Z0-9_\-\.@+]+)(\s[a-zA-Z0-9_\-\.@+]+)*$
+            - name: flag_values
+              type:
+                locator:
+                  path: ./
+                  type: variable
+                  attr: type
+        comments: "The type of the flag_meanings attribute is a string whose value is a blank separated list of words or phrases,  each consisting of characters from the alphanumeric set and the following five: '_', '-', '.', '+', '@'."
+      
+      # 3.5 The number of flag_values attribute values must equal the number of words or phrases appearing in the flag_meanings string.
+      - criteria:
+          attributes: 
+            - name: flag_values 
+            - name: flag_meanings
+        schema:
+          attributes:
+            - name: flag_values
+              length:
+                locator: 
+                  path: ./flag_meanings
+                  type: attribute
+                  attr: length
+        comments: '3.5 The number of flag_values attribute values must equal the number of words or phrases appearing in the flag_meanings string.'
+
+      # 3.5 The number of flag_masks attribute values must equal the number of words or phrases appearing in the flag_meanings string.
+      - criteria:
+          attributes: 
+            - name: flag_masks 
+            - name: flag_meanings
+        schema:
+          attributes:
+            - name: flag_masks
+              length:
+                locator:
+                  path: ./flag_meanings
+                  type: attribute
+                  attr: length
+        comments: '3.5 The number of flag_masks attribute values must equal the number of words or phrases appearing in the flag_meanings string.'
+
+      # 3.5 Variables with a flag_masks attribute must have a type that is compatible with bit field expression (char, byte, short and int), not floating-point (float, real, double), and the flag_masks attribute must have the same type.Variables with a flag_masks attribute must have a type that is compatible with bit field expression (char, byte, short and int), not floating-point (float, real, double), and the flag_masks attribute must have the same type.
+      - criteria:
+          attributes: 
+            - name: flag_masks
+        schema:
+          connector: AND
+          statements:
+            - type: 
+                choice: [char, byte, short, int]
+              attributes:
+                - name: flag_masks
+                  type:
+                    locator: 
+                      path: ./
+                      type: variable
+                      attr: type
+        comments: '3.5 Variables with a flag_masks attribute must have a type that is compatible with bit field expression (char, byte, short and int), not floating-point (float, real, double), and the flag_masks attribute must have the same type.Variables with a flag_masks attribute must have a type that is compatible with bit field expression (char, byte, short and int), not floating-point (float, real, double), and the flag_masks attribute must have the same type.3.5 Variables with a flag_masks attribute must have a type that is compatible with bit field expression (char, byte, short and int), not floating-point (float, real, double), and the flag_masks attribute must have the same type.Variables with a flag_masks attribute must have a type that is compatible with bit field expression (char, byte, short and int), not floating-point (float, real, double), and the flag_masks attribute must have the same type.'
+
+      # 3.5 The flag_masks attribute values must be non-zero.The flag_masks attribute values must be non-zero.
+      - criteria:
+          attributes:
+            - name: flag_masks
+              value:
+                contains: 0
+        count: 0
+        comments: '3.5 The flag_masks attribute values must be non-zero.The flag_masks attribute values must be non-zero.'
+
+      # 4 The axis attribute may only be attached to coordinate variables and geometry node coordinate variable
+      - criteria: 
+          attributes:
+            - name: axis
+        schema:
+          dimensions_count: 1
+          dimensions:
+            - name:
+                locator: 
+                  path: ./
+                  type: variable
+                  attr: name
+        comments: '4 The axis attribute may only be attached to coordinate variables and geometry node coordinate variable'
+      ##
+
+      # 4 The only legal values of axis are X, Y, Z, and T
+      - criteria: 
+          attributes:
+            - name: axis
+        schema:
+          attributes:
+            - name: axis
+              value:
+                choice: [X, Y, Z, T, x, y, z, t]
+        comments: '4 The only legal values of axis are X, Y, Z, and T'
+
+      ##
+
+      # 4 The axis attribute must be consistent with the coordinate type deduced from units and positive
+
+      # TODO
+
+      ##
+
+      # 4 The axis attribute is not allowed for auxiliary coordinate variables.
+
+      # TODO: Check contradiction
+
+      # If an axis attribute is attached to an auxiliary coordinate variable, it can be used by applications in the same way the axis attribute attached to a coordinate variable is used.
+      
+      ##
+
+      # 4 A data variable must not have more than one coordinate variable with a particular value of the axis attribute.
+      - criteria: 
+          attributes:
+            - name: axis
+              value:
+                choice: [x, X]
+        count:
+          operator: <
+          value: 2
+        comments: "4 A data variable must not have more than one coordinate variable with a particular value of the axis attribute."
+
+      - criteria: 
+          attributes:
+            - name: axis
+              value:
+                choice: [y, Y]
+        count:
+          operator: <
+          value: 2
+        comments: "4 A data variable must not have more than one coordinate variable with a particular value of the axis attribute."
+
+      - criteria: 
+          attributes:
+            - name: axis
+              value:
+                choice: [z, Z]
+        count:
+          operator: <
+          value: 2
+        comments: "4 A data variable must not have more than one coordinate variable with a particular value of the axis attribute."
+
+      - criteria: 
+          attributes:
+            - name: axis
+              value:
+                choice: [t, T]
+        count:
+          operator: <
+          value: 2
+
+        comments: "4 A data variable must not have more than one coordinate variable with a particular value of the axis attribute."
+          
+      ##
+
+      # 4.3 The only legal values for the positive attribute are up or down (case insensitive).
+      - criteria: 
+          attributes:
+            - name: positive
+        schema:
+          attributes:
+            - name: positive
+              value:
+                choice: [up, UP, down, DOWN]
+        comments: '4.3 The only legal values for the positive attribute are up or down (case insensitive).'
+      
+      # 4.3.3 The formula_terms attribute is only allowed on a coordinate variable which has a standard_name listed in Appendix C.
+      - criteria:
+          attributes:
+            - name: formula_terms
+        schema:
+          attributes:
+            - name: standard_name
+              value: 
+                choice:
+                  - atmosphere_ln_pressure_coordinate
+                  - atmosphere_sigma_coordinate
+                  - atmosphere_hybrid_sigma_pressure_coordinate
+                  - atmosphere_hybrid_height_coordinate
+                  - atmosphere_sleve_coordinate
+                  - ocean_sigma_coordinate
+                  - ocean_s_coordinate
+                  - ocean_s_coordinate_g1
+                  - ocean_s_coordinate_g2
+                  - ocean_sigma_z_coordinate
+                  - ocean_double_sigma_coordinate
+
+        comments: '4.3.3 The formula_terms attribute is only allowed on a coordinate variable which has a standard_name listed in Appendix C.'
+
+      # 4.3.3 The type of the formula_terms attribute is a string whose value is list of blank separated word pairs in the form term: var. The legal values term are contained in Appendix C for each valid standard_name. The values of var must be variables that exist in the file.
+      - criteria:
+          attributes:
+            - name: formula_terms
+            - name: standard_name
+              value: atmosphere_ln_pressure_coordinate
+        schema:
+          attributes:
+            - name: formula_terms
+              type: string
+              value:
+                re: '(?:\b\w+:\s*\w+\b\s*)+'
+            - name: formula_terms
+              value:
+                parse: 
+                  re: '\b\w+:\s*(\w+)\b'
+                  comparator: 
+                    find: 
+                      variable:
+                        name: $VALUE
+            - name: formula_terms
+              value:
+                parse: 
+                  re: '\b(\w+):\s*\w+\b'
+                  comparator: 
+                    choice:
+                      - p0
+                      - lev
+        comments: '4.3.3 The type of the formula_terms attribute is a string whose value is list of blank separated word pairs in the form term: var. The legal values term are contained in Appendix C for each valid standard_name. The values of var must be variables that exist in the file.'
+
+      #                     ^
+      #                     |
+      # TODO: Expand for all standard name values and their computed_standard_name
+      #
+
+      # 4.3.3 The computed_standard_name attribute is only allowed on a coordinate variable which has a formula_terms attribute.
+      - criteria:
+          attributes:
+            - name: computed_standard_name 
+        schema:
+          attributes:
+            - name: formula_terms
+        comments: '4.3.3 The computed_standard_name attribute is only allowed on a coordinate variable which has a formula_terms attribute.'
+
+      # 4.3.3 The computed_standard_name attribute is a string whose value must be consistent with the standard_name of the coordinate variable it is attached to, and in some cases also with the standard_name attributes of variables named by the formula_terms attribute, according to the appropriate definition in Appendix D.
+      - criteria:
+          attributes:
+            - name: computed_standard_name
+            - name: standard_name
+              value: atmosphere_ln_pressure_coordinate
+        schema:
+          attributes:
+            - name: computed_standard_name
+              type: string
+            - name: computed_standard_name
+              value: air_pressure
+        comments: '4.3.3 TThe computed_standard_name attribute is a string whose value must be consistent with the standard_name of the coordinate variable it is attached to, and in some cases also with the standard_name attributes of variables named by the formula_terms attribute, according to the appropriate definition in Appendix D.'
+
+      #                     ^
+      #                     |
+      # TODO: Expand for all standard name values and their computed_standard_name
+      #
+
+      # TODO: The units of a variable named by the formula_terms attribute must be consistent with the units defined in Appendix D.
+
+
+      # 4.4 The time units of a time coordinate variable must contain a reference date/time.
+      - criteria:
+          connector: OR
+          statements:
+            - attributes:
+                - name: units
+                  value:
+                    udunits:
+                      is_reftime: true
+
+            - attributes:
+                - name: axis
+                  value: T
+
+            - attributes:
+                - name: standard_name
+                  value: 
+                    choice:
+                      - time
+                      - forecast_reference_time
+        schema:
+          attributes:
+            - name: units
+              value:
+                udunits:
+                  is_reftime: true
+        comments: '4.3.3 The time units of a time coordinate variable must contain a reference date/time.'
+  
+      # 4.4.1 The attributes calendar, month_lengths, leap_year, and leap_month may only be attached to time coordinate variables.
+      - criteria:
+          connector: OR
+          statements:
+            - attributes:
+                - name: calendar
+            - attributes:
+                - name: month_lengths
+            - attributes:
+                - name: leap_year
+            - attributes:
+                - name: leap_month 
+        schema:
+          attributes:
+            - name: units
+              value:
+                udunits:
+                  is_reftime: true
+        comments: '4.4.1 The attributes calendar, month_lengths, leap_year, and leap_month may only be attached to time coordinate variables.'
+  
+      # 4.4.1 The standardized values (case insensitive) of the calendar attribute are standard, gregorian (deprecated), proleptic_gregorian, noleap, 365_day, all_leap, 366_day, 360_day, julian, and none. If the calendar attribute is given a non-standard value, then the attribute month_lengths is required, along with leap_year and leap_month as appropriate.
+      - criteria:
+          connector: AND
+          statements:
+            - attributes:
+                - name: calendar
+            - negated:
+                attributes:
+                  - name: calendar
+                    value: 
+                      re: "(?i)\b(standard|gregorian|proleptic_gregorian|noleap|365_day|all_leap|366_day|360_day|julian|none)\b"
+        schema:
+          attributes:
+            - name: month_lengths
+            - name: leap_year
+            - name: leap_month
+        comments: "4.4.1 The standardized values (case insensitive) of the calendar attribute are standard, gregorian (deprecated), proleptic_gregorian, noleap, 365_day, all_leap, 366_day, 360_day, julian, and none. If the calendar attribute is given a non-standard value, then the attribute month_lengths is required, along with leap_year and leap_month as appropriate."
+
+      
+      # 4.4.1 The type of the month_lengths attribute must be an integer array of size 12.
+      - criteria:
+          attributes:
+            - name: month_lengths 
+        schema:
+          attributes:
+            - name: month_lengths
+              type: int
+              length: 12
+        comments: '4.4.1 The type of the month_lengths attribute must be an integer array of size 12.'
+
+      # 4.4.1 The values of the leap_month attribute must be in the range 1-12.
+      - criteria:
+          attributes:
+            - name: leap_month  
+        schema:
+          attributes:
+            - name: leap_month 
+              type: int
+              length: 1
+              value:
+                range: 
+                  min: 1
+                  max: 12
+        comments: '4.4.1 The values of the leap_month attribute must be in the range 1-12.'
+
+      # 4.4.1 The values of the leap_year and leap_month attributes are integer scalars.
+      - criteria:
+          attributes:
+            - name: leap_year 
+        schema:
+          attributes:
+            - name: leap_year 
+              type: int
+              length: 1
+        comments: '4.4.1 The values of the leap_year and leap_month attributes are integer scalars.'
+            
+
+      # 5 Coordinate System
+      - criteria:
+          dimensions_count: 1
+          dimensions:
+            - name:
+                locator: 
+                  path: ./
+                  type: variable
+                  attr: name
+        schema:
+          value:
+            monotonic: True
+        comments: '5 A coordinate variable must have values that are strictly monotonic (increasing or decreasing).'
+
+      - criteria:
+          connector: AND
+          statements:
+            - dimensions_count: 1
+              dimensions:
+                - name:
+                    locator: 
+                      path: ./
+                      type: variable
+                      attr: name
+            - connector: OR
+              statements:
+                - attributes:
+                  - name: _FillValue
+                - attributes:
+                  - name: missing_value
+        count: 0
+        comments: "5 A coordinate variable must not have the _FillValue or missing_value attributes."
+          
+      - criteria:
+          attributes:
+            - name: coordinates
+        schema:
+          attributes:
+            - name: coordinates
+              type: string
+              value:
+                parse:
+                  re: '\S+'
+                  comparator:
+                    find: 
+                      variable:
+                        name: $VALUE
+        comments: "5 The type of the coordinates attribute is a string whose value is a blank separated list of variable names. All specified variable names must exist in the file."
+
+      # TODO: The dimensions of each auxiliary coordinate must be a subset of the dimensions of the variable they are attached to, with three exceptions. First, a label variable of type char will have a trailing dimension for the maximum string length. Second, if an auxiliary coordinate variable of a data variable that has been compressed by gathering (8.2 Lossless Compression by Gathering) does not span the compressed dimension, then its dimensions may be any subset of the data variable’s uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the compress attribute of the compressed coordinate variable. Third, a ragged array (Chapter 9, Discrete sampling geometries and Appendix H) uses special, more indirect, methods to connect the data and coordinates.
+    
+      - criteria:
+          attributes:
+            - name: grid_mapping
+        schema:
+          attributes:
+            - name: grid_mapping
+              value:
+                re: /^(\w+)(:\s*\w+(\s+\w+)*\s*)?(\s+\w+(:\s*\w+(\s+\w+)*\s*)?)*$/
+            - name: grid_mapping
+              type: string
+              value:
+                parse:
+                  re: '\w+(?=\s*:)' # matches each grid_mapping_name
+                  comparator:
+                    find: 
+                      variable:
+                        name: $VALUE
+                        attributes:
+                          - name: grid_mapping_name
+            - name: grid_mapping
+              type: string
+              value:
+                parse:
+                  re: '\b(?!\w+:)\w+' # matches each coord_var
+                  comparator:
+                    find:
+                      variable:
+                        name: $VALUE
+                        attributes:
+                          - name: coordinates
+                            value:
+                              contains: $VALUE
+        comments: 
+          - '5.6 The type of the grid_mapping attribute is a string whose value is of the following form, in which brackets indicate optional text: grid_mapping_name[: coord_var [coord_var ...]] [grid_mapping_name: [coord_var ... ]]'
+          - '5.6 Note that in its simplest form the attribute comprises just a grid_mapping_name as a single word.'
+          - '5.6 Each grid_mapping_name is the name of a variable (known as a grid mapping variable), which must exist in the file.'
+          - '5.6 Each coord_var is the name of a coordinate variable or auxiliary coordinate variable, which must exist in the file. If it is an auxiliary coordinate variable, it must be listed in the coordinates attribute.'
+      
+      
+      - criteria:
+          attributes:
+            - name: grid_mapping_name
+        schema:
+          attributes:
+            - name: grid_mapping_name 
+              value:
+                choice:
+                  - albers_conical_equal_area
+                  - azimuthal_equidistant
+                  - geostationary
+                  - lambert_azimuthal_equal_area
+                  - lambert_conformal_conic
+                  - lambert_cylindrical_equal_area
+                  - latitude_longitude
+                  - mercator
+                  - oblique_mercator
+                  - orthographic
+                  - polar_stereographic
+                  - rotated_latitude_longitude
+                  - sinusoidal
+                  - stereographic
+                  - transverse_mercator
+                  - vertical_perspective
+        comments: '5.6 The grid mapping variables must have the grid_mapping_name attribute. The legal values for the grid_mapping_name attribute are contained in Appendix F.'
+
+      # TODO: The data types of the attributes of the grid mapping variable must be specified in Table 1 of Appendix F.
+
+
+      
