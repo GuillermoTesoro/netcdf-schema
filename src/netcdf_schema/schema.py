@@ -110,6 +110,7 @@ class GroupSchema():
     attributes: List[Item] = None
     dimensions: List[Item] = None
     variables: List[Item] = None
+    count: Union[int, CountOperator, Constant] = None
 
 @dataclass
 class NetCDFSchema():

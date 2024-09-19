@@ -103,32 +103,32 @@ groups:
       - criteria:
           name: title
         schema:
-          type: string
+          type: str
         comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
       - criteria:
           name: history
         schema:
-          type: string
+          type: str
         comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
       - criteria:
           name: institution
         schema:
-          type: string
+          type: str
         comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
       - criteria:
           name: source
         schema:
-          type: string
+          type: str
         comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
       - criteria:
           name: references
         schema:
-          type: string
+          type: str
         comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
       - criteria:
           name: comment
         schema:
-          type: string
+          type: str
         comments: '2.6.2 The title, history, institution, source, references, and comment attributes are all type string'
         ##
 
@@ -161,7 +161,105 @@ groups:
           value:
             choice: ['temperature: on_scale', 'temperature: difference', 'temperature: unknown']
         comments: '3.1 If present, the units_metadata attribute must have one of these values: temperature: on_scale, temperature: difference, temperature: unknown.'
-          
+
+      - criteria:
+          name: coordinates
+        schema:
+          name: coordinates
+          type: str
+          value:
+            parse:
+              re: '\S+'
+              comparator:
+                find: 
+                  variable:
+                    name: $VALUE
+        comments: "5 The type of the coordinates attribute is a string whose value is a blank separated list of variable names. All specified variable names must exist in the file."
+
+      - criteria:
+          name: standard_name
+        schema:
+          name: standard_name
+          value:
+            choice: [] # TODO: Put all the allowed values here or think about a better way. Constant?
+        comments: '3.3 The standard_name attribute takes a string value comprised of a standard name optionally followed by one or more blanks and a standard name modifier.'
+      
+      - criteria: 
+          attributes:
+            - name: positive
+        schema:
+          attributes:
+            - name: positive
+              value:
+                choice: [up, UP, down, DOWN]
+        comments: '4.3 The only legal values for the positive attribute are up or down (case insensitive).'
+      
+      - criteria:
+          name: grid_mapping
+        schema:
+          connector: AND
+          statements:
+            - name: grid_mapping
+              value:
+                re: /^(\w+)(:\s*\w+(\s+\w+)*\s*)?(\s+\w+(:\s*\w+(\s+\w+)*\s*)?)*$/
+            - name: grid_mapping
+              type: str
+              value:
+                parse:
+                  re: '\w+(?=\s*:)' # matches each grid_mapping_name
+                  comparator:
+                    find: 
+                      variable:
+                        name: $VALUE
+                        attributes:
+                          - name: grid_mapping_name
+            - name: grid_mapping
+              type: str
+              value:
+                parse:
+                  re: '\b(?!\w+:)\w+' # matches each coord_var
+                  comparator:
+                    find:
+                      variable:
+                        name: $VALUE
+                        attributes:
+                          - name: coordinates
+                            value:
+                              contains: $VALUE
+        comments: 
+          - '5.6 The type of the grid_mapping attribute is a string whose value is of the following form, in which brackets indicate optional text: grid_mapping_name[: coord_var [coord_var ...]] [grid_mapping_name: [coord_var ... ]]'
+          - '5.6 Note that in its simplest form the attribute comprises just a grid_mapping_name as a single word.'
+          - '5.6 Each grid_mapping_name is the name of a variable (known as a grid mapping variable), which must exist in the file.'
+          - '5.6 Each coord_var is the name of a coordinate variable or auxiliary coordinate variable, which must exist in the file. If it is an auxiliary coordinate variable, it must be listed in the coordinates attribute.'
+      
+      
+      - criteria:
+          name: grid_mapping_name
+        schema:
+          name: grid_mapping_name 
+          value:
+            choice:
+              - albers_conical_equal_area
+              - azimuthal_equidistant
+              - geostationary
+              - lambert_azimuthal_equal_area
+              - lambert_conformal_conic
+              - lambert_cylindrical_equal_area
+              - latitude_longitude
+              - mercator
+              - oblique_mercator
+              - orthographic
+              - polar_stereographic
+              - rotated_latitude_longitude
+              - sinusoidal
+              - stereographic
+              - transverse_mercator
+              - vertical_perspective
+        comments: '5.6 The grid mapping variables must have the grid_mapping_name attribute. The legal values for the grid_mapping_name attribute are contained in Appendix F.'
+
+      # TODO: The data types of the attributes of the grid mapping variable must be specified in Table 1 of Appendix F.
+
+
     dimensions:
       # 2.3 Variable, dimension and attribute names should begin with a letter and be composed of letters (A-Z, a-z), digits (0-9), and underscores(_).
       - schema:
@@ -441,20 +539,7 @@ groups:
             - name: temperature_metadata 
         count: 0
         comments: '3.1 A variable must not have a units_metadata attribute if it has no units attribute or if its units do not involve a temperature unit.'
-
-      # 3.3 The standard_name attribute takes a string value comprised of a standard name optionally followed by one or more blanks and a standard name modifier.
-      # The legal values for the standard name are contained in the standard name table.
-      # The legal values for the standard name modifier are contained in Appendix C, Standard Name Modifiers.
       
-      - criteria:
-          attributes:
-            - name: standard_name
-        schema:
-          attributes:
-            - name: standard_name
-              value:
-                choice: [] # TODO: Put all the allowed values here or think about a better way
-        comments: 'The standard_name attribute takes a string value comprised of a standard name optionally followed by one or more blanks and a standard name modifier.'
 
       # 3.3 If a variable has a standard_name of region or area_type, it must have value(s) from the permitted list.
       - criteria:
@@ -480,7 +565,7 @@ groups:
         schema:
           attributes: 
             - name: flag_meanings
-              type: string
+              type: str
               value:  
                 re: ^([a-zA-Z0-9_\-\.@+]+)(\s[a-zA-Z0-9_\-\.@+]+)*$
             - name: flag_values
@@ -563,16 +648,6 @@ groups:
         comments: '4 The axis attribute may only be attached to coordinate variables and geometry node coordinate variable'
       ##
 
-      # 4 The only legal values of axis are X, Y, Z, and T
-      - criteria: 
-          attributes:
-            - name: axis
-        schema:
-          attributes:
-            - name: axis
-              value:
-                choice: [X, Y, Z, T, x, y, z, t]
-        comments: '4 The only legal values of axis are X, Y, Z, and T'
 
       ##
 
@@ -633,17 +708,6 @@ groups:
         comments: "4 A data variable must not have more than one coordinate variable with a particular value of the axis attribute."
           
       ##
-
-      # 4.3 The only legal values for the positive attribute are up or down (case insensitive).
-      - criteria: 
-          attributes:
-            - name: positive
-        schema:
-          attributes:
-            - name: positive
-              value:
-                choice: [up, UP, down, DOWN]
-        comments: '4.3 The only legal values for the positive attribute are up or down (case insensitive).'
       
       # 4.3.3 The formula_terms attribute is only allowed on a coordinate variable which has a standard_name listed in Appendix C.
       - criteria:
@@ -677,7 +741,7 @@ groups:
         schema:
           attributes:
             - name: formula_terms
-              type: string
+              type: str
               value:
                 re: '(?:\b\w+:\s*\w+\b\s*)+'
             - name: formula_terms
@@ -721,7 +785,7 @@ groups:
         schema:
           attributes:
             - name: computed_standard_name
-              type: string
+              type: str
             - name: computed_standard_name
               value: air_pressure
         comments: '4.3.3 TThe computed_standard_name attribute is a string whose value must be consistent with the standard_name of the coordinate variable it is attached to, and in some cases also with the standard_name attributes of variables named by the formula_terms attribute, according to the appropriate definition in Appendix D.'
@@ -871,91 +935,10 @@ groups:
                   - name: missing_value
         count: 0
         comments: "5 A coordinate variable must not have the _FillValue or missing_value attributes."
-          
-      - criteria:
-          attributes:
-            - name: coordinates
-        schema:
-          attributes:
-            - name: coordinates
-              type: string
-              value:
-                parse:
-                  re: '\S+'
-                  comparator:
-                    find: 
-                      variable:
-                        name: $VALUE
-        comments: "5 The type of the coordinates attribute is a string whose value is a blank separated list of variable names. All specified variable names must exist in the file."
 
       # TODO: The dimensions of each auxiliary coordinate must be a subset of the dimensions of the variable they are attached to, with three exceptions. First, a label variable of type char will have a trailing dimension for the maximum string length. Second, if an auxiliary coordinate variable of a data variable that has been compressed by gathering (8.2 Lossless Compression by Gathering) does not span the compressed dimension, then its dimensions may be any subset of the data variable’s uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the compress attribute of the compressed coordinate variable. Third, a ragged array (Chapter 9, Discrete sampling geometries and Appendix H) uses special, more indirect, methods to connect the data and coordinates.
     
-      - criteria:
-          attributes:
-            - name: grid_mapping
-        schema:
-          attributes:
-            - name: grid_mapping
-              value:
-                re: /^(\w+)(:\s*\w+(\s+\w+)*\s*)?(\s+\w+(:\s*\w+(\s+\w+)*\s*)?)*$/
-            - name: grid_mapping
-              type: string
-              value:
-                parse:
-                  re: '\w+(?=\s*:)' # matches each grid_mapping_name
-                  comparator:
-                    find: 
-                      variable:
-                        name: $VALUE
-                        attributes:
-                          - name: grid_mapping_name
-            - name: grid_mapping
-              type: string
-              value:
-                parse:
-                  re: '\b(?!\w+:)\w+' # matches each coord_var
-                  comparator:
-                    find:
-                      variable:
-                        name: $VALUE
-                        attributes:
-                          - name: coordinates
-                            value:
-                              contains: $VALUE
-        comments: 
-          - '5.6 The type of the grid_mapping attribute is a string whose value is of the following form, in which brackets indicate optional text: grid_mapping_name[: coord_var [coord_var ...]] [grid_mapping_name: [coord_var ... ]]'
-          - '5.6 Note that in its simplest form the attribute comprises just a grid_mapping_name as a single word.'
-          - '5.6 Each grid_mapping_name is the name of a variable (known as a grid mapping variable), which must exist in the file.'
-          - '5.6 Each coord_var is the name of a coordinate variable or auxiliary coordinate variable, which must exist in the file. If it is an auxiliary coordinate variable, it must be listed in the coordinates attribute.'
       
-      
-      - criteria:
-          attributes:
-            - name: grid_mapping_name
-        schema:
-          attributes:
-            - name: grid_mapping_name 
-              value:
-                choice:
-                  - albers_conical_equal_area
-                  - azimuthal_equidistant
-                  - geostationary
-                  - lambert_azimuthal_equal_area
-                  - lambert_conformal_conic
-                  - lambert_cylindrical_equal_area
-                  - latitude_longitude
-                  - mercator
-                  - oblique_mercator
-                  - orthographic
-                  - polar_stereographic
-                  - rotated_latitude_longitude
-                  - sinusoidal
-                  - stereographic
-                  - transverse_mercator
-                  - vertical_perspective
-        comments: '5.6 The grid mapping variables must have the grid_mapping_name attribute. The legal values for the grid_mapping_name attribute are contained in Appendix F.'
-
-      # TODO: The data types of the attributes of the grid mapping variable must be specified in Table 1 of Appendix F.
 
 
       
